@@ -22,7 +22,7 @@ int main(int argc, char *argv[]) {
     int listenfd = socket (AF_INET, SOCK_STREAM, 0); // ipv4,tcp, default
 
     struct addrinfo hints, *res; 
-    memset (¾hints, 0, sizeof hints)); // empty template
+    memset(&hints, 0, sizeof hints); // empty template
     hints.ai_family = AF_INET; // force ipv4 
     hints.ai_socktype = SOCK_STREAM; // tcp
     hints.ai_flags = AI_PASSIVE; // fill in my IP for me
@@ -43,12 +43,16 @@ int main(int argc, char *argv[]) {
     char recv_buffer[1024]; // received data buffer
     time_t ticks; // time
 
+    int connfd= accept (sockfd, NULL, NULL);
+
     while(1) {
 
-        int connfd= accept (sockfd, NULL, NULL);
+        
         ticks = time(NULL); // get time
         snprintf (send_buffer, sizeof send_buffer, "%.24s\r\n", ctime(&ticks)); // format time
-        send (connfd, send_buffer, sizeof send_buffer, 0); // send time
+        //send (connfd, send_buffer, sizeof send_buffer, 0); // send time
+        char message[]="zarttirizortzort";
+        send (connfd, message, sizeof message,0); // send time
     }
 
     freeaddrinfo(res); // free mem
