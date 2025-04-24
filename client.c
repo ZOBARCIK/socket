@@ -30,8 +30,49 @@ int main(int argc, char *argv[]) {
     connect(sockfd, (struct sockaddr *)&serv_addr, sizeof(serv_addr)); // connect to server
     char recv_buffer[1024]; // received data buffer
     char send_buffer[1024]; // sent data buffer
-    int n = recv(sockfd, recv_buffer, sizeof(recv_buffer), 0); // receive data
-    printf("received %s\n", recv_buffer); // print received data
+
+
+    send(sockfd, "handshake recognized\n", strlen("handshake recognized\n"), 0);
+    printf("sent: %s\n", "handshake recognized");
+    fflush(stdout);
+    pid_t pid = fork();
+    
+    if (pid == 0) {
+        
+        while (1) { 
+            
+            //listen continuously
+            int n = recv(sockfd, recv_buffer, sizeof(recv_buffer), 0);
+            if (n <= 0) break;
+            recv_buffer[n] = '\0';
+            printf("\n received %s\n", recv_buffer);
+            fflush(stdout);
+            pid=1;
+        }
+
+    }else{
+        sleep(1);
+        while(1) {
+            //input via terminal
+            printf("\n Message to server: ");
+            fflush(stdout);
+            fgets(send_buffer, sizeof(send_buffer), stdin);
+            send(sockfd, send_buffer, strlen(send_buffer), 0);
+
+            //eunjung pingpong
+            if (strcmp(recv_buffer, "EUN") == 0) {
+                send(sockfd, "JUNG", strlen("JUNG"), 0);
+            } else if (strcmp(recv_buffer, "eun") == 0) {
+                send(sockfd, "jung", strlen("jung"), 0);
+            } else if (strcmp(recv_buffer, "JUNG") == 0) {
+                send(sockfd, "EUN", strlen("EUN"), 0);
+            } else if (strcmp(recv_buffer, "jung") == 0) {
+                send(sockfd, "eun", strlen("eun"), 0);
+            }
+
+        }
+    }
+    
 
     close (sockfd); // cut conn
     return 0;
